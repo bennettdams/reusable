@@ -4,12 +4,32 @@ import { isServer } from "./server-utils";
 
 const defaultLanguage: string = isServer() ? "en" : navigator.language;
 
+const dateTimeFormatters = {
+  "hh:mm": formatDateToHourAndMinute,
+  "hh:mm:ss": formatDateToHourAndMinuteAndSecond,
+  "MM-DD": formatDateToMonthAndDay,
+  "MM-DD hh:mm": formatDateToMonthAndDayAndHourAndMinute,
+  "MM-DD hh:mm:ss": formatDateToMonthAndDayAndHourAndMinuteAndSecond,
+  "YYYY-MM-DD": formatDateToYearAndMonthAndDay,
+  "YYYY-MM-DD hh:mm": formatDateToYearAndMonthAndDayAndHourAndMinute,
+  "UTC YYYY-MM-DD": formatDateToUTCYearAndMonthAndDay,
+} as const;
+
+export type DateTimeFormat = keyof typeof dateTimeFormatters;
+
+/**
+ * Global function to format date-time.
+ */
+export function formatDateTime(date: Date, format: DateTimeFormat) {
+  return dateTimeFormatters[format](date);
+}
+
 /**
  * String representation with hours & minutes of a date.
  * @param date Date object to format
  * @returns formatted string for client time zone, e.g. "15:34"
  */
-export function formatDateToHourAndMinute(date: Date): string {
+function formatDateToHourAndMinute(date: Date): string {
   return date.toLocaleTimeString(defaultLanguage, {
     hour: "2-digit",
     minute: "2-digit",
@@ -22,7 +42,7 @@ export function formatDateToHourAndMinute(date: Date): string {
  * @param date Date object to format
  * @returns formatted string for client time zone, e.g. "15:34:12"
  */
-export function formatDateToHourAndMinuteAndSecond(date: Date): string {
+function formatDateToHourAndMinuteAndSecond(date: Date): string {
   return date.toLocaleTimeString(defaultLanguage, {
     hour: "2-digit",
     minute: "2-digit",
@@ -36,7 +56,7 @@ export function formatDateToHourAndMinuteAndSecond(date: Date): string {
  * @param date Date object to format
  * @returns formatted string for client time zone, e.g. "05/22"
  */
-export function formatDateToMonthAndDay(date: Date): string {
+function formatDateToMonthAndDay(date: Date): string {
   return date.toLocaleDateString(defaultLanguage, {
     month: "2-digit",
     day: "2-digit",
@@ -48,7 +68,7 @@ export function formatDateToMonthAndDay(date: Date): string {
  * @param date Date object to format
  * @returns formatted string for client time zone, e.g. "24.12.2021"
  */
-export function formatDateToYearAndMonthAndDay(date: Date): string {
+function formatDateToYearAndMonthAndDay(date: Date): string {
   return date.toLocaleDateString(defaultLanguage, {
     year: "numeric",
     month: "2-digit",
@@ -61,7 +81,7 @@ export function formatDateToYearAndMonthAndDay(date: Date): string {
  * @param date Date object to format
  * @returns formatted string for client time zone, e.g. "25-11 15:34"
  */
-export function formatDateToMonthAndDayAndHourAndMinute(date: Date): string {
+function formatDateToMonthAndDayAndHourAndMinute(date: Date): string {
   return `${formatDateToMonthAndDay(date)} ${formatDateToHourAndMinute(date)}`;
 }
 
@@ -70,9 +90,7 @@ export function formatDateToMonthAndDayAndHourAndMinute(date: Date): string {
  * @param date Date object to format
  * @returns formatted string for client time zone, e.g. "25-11 15:34:12"
  */
-export function formatDateToMonthAndDayAndHourAndMinuteAndSecond(
-  date: Date
-): string {
+function formatDateToMonthAndDayAndHourAndMinuteAndSecond(date: Date): string {
   return `${formatDateToMonthAndDay(date)} ${formatDateToHourAndMinuteAndSecond(
     date
   )}`;
@@ -81,11 +99,9 @@ export function formatDateToMonthAndDayAndHourAndMinuteAndSecond(
 /**
  * String representation with year, months, days, hours & minutes of a date.
  * @param date Date object to format
- * @returns formatted string for client time zone, e.g. "25-11 15:34"
+ * @returns formatted string for client time zone, e.g. "06/30/2022 18:22"
  */
-export function formatDateToYearAndMonthAndDayAndHourAndMinute(
-  date: Date
-): string {
+function formatDateToYearAndMonthAndDayAndHourAndMinute(date: Date): string {
   return `${formatDateToYearAndMonthAndDay(date)} ${formatDateToHourAndMinute(
     date
   )}`;
@@ -110,10 +126,10 @@ export function formatDateToYearAndMonthAndDayAndHourAndMinute(
  *
  * @returns formatted string for client time zone, e.g. "2021-11-25"
  */
-export function formatDateToFixedString(date: Date): string {
+function formatDateToUTCYearAndMonthAndDay(date: Date): string {
   const minutesOffset = date.getTimezoneOffset();
   const millisecondsOffset = minutesOffset * 60 * 1000;
   const falseLocalDate = new Date(date.getTime() - millisecondsOffset);
 
-  return falseLocalDate.toISOString().substr(0, 10);
+  return falseLocalDate.toISOString().substring(0, 10);
 }
