@@ -1,5 +1,4 @@
-import { MouseEvent, LegacyRef, ReactNode, useEffect } from "react";
-import { useState } from "react";
+import { LegacyRef, MouseEvent, ReactNode, useEffect, useState } from "react";
 import { OmitStrict } from "../types/util-types";
 import { IconX } from "./Icon";
 import { LoadingAnimation } from "./LoadingAnimation";
@@ -105,7 +104,7 @@ export function Button({
       <div className="flex items-center justify-center">
         {icon && (
           <span className="mr-1 leading-none">
-            {showLoading ? <LoadingAnimation size="tiny" /> : icon}
+            {showLoading ? <LoadingAnimation size="small" /> : icon}
           </span>
         )}
         <span className={`${!!small && "text-sm"}`}>{children}</span>
